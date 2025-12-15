@@ -3,7 +3,7 @@
 ## 📺 Demo Video Link
 
 **Hosted Video Link (YouTube Unlisted / Loom):**  
-> 🔗 **[INSERT YOUR VIDEO LINK HERE]**
+> 🔗 **https://www.loom.com/share/88a4206e37a142d7937948b1f8b925fa**
 
 ---
 
