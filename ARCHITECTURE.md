@@ -137,8 +137,10 @@ GradPath is an intelligent agentic AI system designed to help students find the 
   - ➕ New Chat button for starting fresh conversations
   - 🔵/⚪ Active/inactive session indicators
   - 🗑️ Delete unwanted chat sessions
+  - 🔄 Refresh button to view current memory state
   - Auto-naming from first user message
-  - Real-time profile display
+  - Real-time profile display in sidebar
+  - Session-isolated memory (each chat maintains its own profile)
 
 #### **ADK Playground Integration** (`root_agent.py`)
 - Simple entry point: `handle_message(user_input, session_id)`
@@ -243,20 +245,43 @@ GradPath is an intelligent agentic AI system designed to help students find the 
    ```
 
 3. **Result Synthesis**: Gemini generates final response
-   - Filters top 5-10 programs
-   - Creates markdown table with:
+   - Separates results into:
+     * **University Programs**: Actual degree programs (MS/PhD) at specific universities
+     * **External Funding**: Fellowships/scholarships not tied to specific programs
+   - Filters top 5-10 university programs
+   - Creates THREE sections:
+     
+     **Section 1: University Programs Table**
      - Program Name, Degree, University
      - Location, Funding Info
-     - Requirements, Deadlines
-     - Website links
-   - Adds personalized guidance
-   - Includes follow-up questions
+     - Requirements, Deadlines, Duration, Intake
+     - Website links to actual program pages
+     
+     **Section 2: Additional Funding Opportunities** (if found)
+     - External fellowships (Fulbright, DAAD, etc.)
+     - Eligibility, amount, deadlines
+     - Separate from program listings
+     
+     **Section 3: Personalized Guidance**
+     - Why these programs fit your profile
+     - Trade-offs to consider
+     - How to combine external funding
+     - Concrete next steps
+   
+   - Includes intelligent follow-up questions
 
 **Writer Output Format**:
 ```markdown
+## 🎓 University Programs
+
 | # | Program Name | Degree | University | Location | Funding | Requirements | Deadline | Website |
 |---|--------------|--------|------------|----------|---------|--------------|----------|---------|
-| 1 | MS Data Science | MS | Stanford | CA, USA | TA/RA | GPA 3.5+ | Jan 15 | [Link](url) |
+| 1 | PhD Machine Learning | PhD | Stanford | CA, USA | Full RA/TA | GPA 3.5+ | Dec 15 | [Link](url) |
+
+## 💰 Additional Funding Opportunities
+
+- **Fulbright Foreign Student Program**: Full funding for international students...
+- **DAAD Scholarship**: German government funding for PhD students...
 
 ### My guidance for you:
 - I picked these programs because...
@@ -458,41 +483,44 @@ except json.JSONDecodeError:
 2. COORDINATOR
    ↓
    - Classifies as "new_search"
-   - Extracts: GPA=3.4, field=Data Science, degree=MS, location=USA, funding=needed
+   - Extracts: GPA=3.7, field=Machine Learning, degree=PhD, location=US, funding=full, focus=healthcare
    - Updates profile in memory
-   - Checks readiness → HAS: field + degree → Ready to search!
+   - Checks readiness → HAS: field + degree + location → Ready to search!
 
 3. PLANNER (Gemini API)
    ↓
    - Receives: user message + current profile
-   - Generates search plan:
+   - Generates search plan with 5-7 structured queries:
      * Profile updates
-     * Filters (field, degree, country, funding)
+     * Filters (field, degree, country, funding, healthcare focus)
      * Search queries: [
-         "MS Data Science fully funded USA",
-         "Data Science graduate programs scholarships",
-         "MS Data Science funding opportunities"
+         "PhD Machine Learning USA",  # General programs
+         "Machine Learning PhD funding scholarships",  # Funding-specific
+         "PhD Machine Learning admission requirements",  # Requirements
+         "Machine Learning healthcare AI PhD",  # Specialty focus
+         "PhD Machine Learning Fall 2026 fully funded"  # Specific intake
        ]
 
 4. SEARCH EXECUTOR
    ↓
-   - Executes 3 searches via Serper API
-   - Collects ~15 program candidates
+   - Executes 5-7 searches via Serper API
+   - Collects ~20-30 program candidates
    - Each has: title, URL, snippet, university
 
 5. WRITER (Gemini API)
    ↓
    - Receives: profile + plan + candidates
-   - Synthesizes response:
-     * Markdown table with 5-10 programs
-     * Personalized guidance
-     * Trade-offs and recommendations
+   - Separates university programs from external funding
+   - Synthesizes THREE-section response:
+     * Section 1: University Programs Table (5-10 actual degree programs)
+     * Section 2: Additional Funding Opportunities (external fellowships if found)
+     * Section 3: Personalized guidance with trade-offs and next steps
 
 6. FOLLOW-UP GENERATOR (Gemini API)
    ↓
    - Analyzes: profile + query type + results
    - Generates 3 contextual questions:
-     * "Compare funding at Stanford vs MIT?"
+     * "Compare Carnegie Mellon and Cedars-Sinai programs?"
      * "Search for programs with later deadlines?"
      * "Learn about GRE waiver options?"
 

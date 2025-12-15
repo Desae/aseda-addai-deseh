@@ -159,8 +159,14 @@ with st.sidebar:
     st.caption(f"Session: {current_session_id[:8]}...")
     st.caption(f"Messages: {len(current_session['messages'])}")
     
-    # Display current profile
-    st.subheader("Your Profile")
+    # Display current profile with refresh button
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.subheader("Your Profile")
+    with col2:
+        if st.button("🔄", key="refresh_profile", help="Refresh profile data"):
+            st.rerun()
+    
     profile = profile_store.as_dict(current_session_id)
     if profile:
         for key, value in profile.items():

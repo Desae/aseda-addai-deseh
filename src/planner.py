@@ -66,9 +66,14 @@ IMPORTANT SEARCH QUERY RULES:
 - Use 1-2 quoted phrases MAX per query (e.g., "Data Science" OR "MS program")
 - Avoid site: operators unless specifically needed
 - Use natural language: "MS Data Science funding USA" NOT site:.edu "MS" "Data Science" "funding"
-- Generate 3-5 different queries with different keyword combinations
+- Generate 5-7 different queries with different keyword combinations
 - Focus on findable terms: program names, degree types, countries, funding types
-- Each query should be distinct and target different aspects (program pages, admission requirements, funding info)
+- Each query should be distinct and target different aspects:
+  * Query 1-2: General program pages (e.g., "PhD Machine Learning USA")
+  * Query 3-4: Funding-specific (e.g., "Machine Learning PhD funding scholarships")
+  * Query 5-6: Requirements/admissions (e.g., "PhD Machine Learning admission requirements")
+  * Query 7: Specialty focus if applicable (e.g., "Machine Learning healthcare AI PhD")
+- Vary the keyword order and combinations to catch different result sets
 
 Examples of GOOD queries:
 - "MS Data Science" fully funded scholarships

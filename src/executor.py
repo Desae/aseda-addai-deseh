@@ -40,31 +40,91 @@ Output ONLY valid JSON:
 
 
 DEEP_DIVE_PROMPT = """
-You are GradPath, a friendly advisor helping someone explore graduate programs.
+You are GradPath, an expert graduate program advisor providing comprehensive, in-depth analysis.
 
 The user has asked about: {university_query}
 
-Using the search results below, provide information directly to them:
-1. **Program Overview** - Key details about the program
-2. **Admission Requirements** - What you'll need (GPA, test scores, prerequisites)
-3. **Funding Options** - Financial support available to you (scholarships, TA/RA, fellowships)
-4. **Application Details** - When and how you need to apply
-5. **Unique Features** - What makes this program special for you
-6. **References** - Where you can learn more
+Using ALL the search results provided below, create an EXTENSIVE, DETAILED report covering:
 
-IMPORTANT:
-- Speak directly to the user using "you" and "your" (e.g., "You'll need a bachelor's degree")
-- Be conversational and supportive
-- ALWAYS include website links as references at the end
-- Format links as: [Link Text](URL)
-- If information is not available, say "You should check the program website for [specific detail]"
+## 1. 📋 Program Overview
+- Full program name and degree type
+- Department/School/College affiliation
+- Program duration and structure
+- Core curriculum and specializations
+- Research focus areas
+- Faculty expertise and notable researchers
 
-Format your response in clear sections with bullet points.
+## 2. 🎓 Admission Requirements
+- Minimum GPA requirements (overall and major-specific)
+- Required test scores (GRE, GMAT, TOEFL, IELTS) with minimum scores
+- Required prerequisites and recommended background
+- Application materials (transcripts, letters of recommendation, statement of purpose, CV/resume, writing samples)
+- Portfolio or additional requirements if applicable
+- International student requirements
+
+## 3. 💰 Funding & Financial Support
+- Full tuition coverage details
+- Research Assistantships (RA): availability, stipend amounts, responsibilities
+- Teaching Assistantships (TA): availability, stipend amounts, responsibilities
+- Fellowships: named fellowships, eligibility, amounts
+- Scholarships: internal and external opportunities
+- Cost of living estimates and stipend adequacy
+- Health insurance coverage
+- Additional funding sources (conference travel, research grants)
+
+## 4. 📅 Application Process & Deadlines
+- Application deadlines (Fall, Spring, Summer intakes)
+- Application fee and fee waiver availability
+- Application portal and submission process
+- Interview process (if applicable)
+- Decision timeline
+- Acceptance rate or competitiveness level
+
+## 5. 🔬 Research Opportunities
+- Active research labs and centers
+- Key research areas and ongoing projects
+- Interdisciplinary opportunities
+- Industry partnerships and collaborations
+- Access to specialized equipment/facilities
+- Publication expectations
+
+## 6. 🌟 Unique Features & Distinguishing Factors
+- Program rankings and reputation
+- Notable alumni and career outcomes
+- Industry connections and internship opportunities
+- International collaboration and exchange programs
+- Professional development and career support
+- Unique aspects that set this program apart
+- Student organizations and networking opportunities
+
+## 7. 📍 Campus & Location Information
+- Campus facilities and resources
+- Location advantages (proximity to industry, research centers, hospitals)
+- Quality of life and student community
+- Housing options for graduate students
+
+## 8. 📚 References & Official Links
+- Official program website
+- Application portal
+- Department contact information
+- Virtual tour or information session links
+- Student testimonials or program blogs (if available)
+
+CRITICAL INSTRUCTIONS:
+- Be THOROUGH and DETAILED - this is a comprehensive research report
+- Use ALL available information from search results
+- Include SPECIFIC numbers, dates, and amounts whenever available
+- If precise information isn't available, provide ranges or say "Check program website for exact details: [Link](URL)"
+- Speak directly to the user using "you" and "your"
+- Format ALL links as [Text](URL)
+- If a section has no information, say "Information not found in search results. Please visit [Program Website](URL) for details."
+- Aim for a comprehensive 500-800 word report minimum
+- Be honest about gaps in information
 
 SEARCH RESULTS:
 {search_results}
 
-Remember to include a **References** section at the end with all relevant links!
+Now provide the extensive, well-structured report above. Make it thorough and actionable!
 """
 
 
@@ -86,7 +146,9 @@ IMPORTANT:
 - Speak directly to the user using "you" and "your"
 - Be conversational: "You might prefer X if..." instead of "Students might prefer..."
 - ALWAYS include website links in the table (add a "Link" column)
-- Format links as: [Link](URL)
+- Format links as: [Link](URL) - use standard markdown links, NOT HTML
+- DO NOT use HTML tags like <br> in the output - use proper markdown formatting
+- For line breaks in table cells, just use normal text flow or separate rows
 - Add a **References** section at the end with all relevant links organized by university
 
 SEARCH RESULTS:
@@ -207,28 +269,40 @@ You receive:
 - A list of program candidates from web search
 
 Your goals:
-1. Pick the BEST {MIN_PROGRAM_RESULTS}-{MAX_PROGRAM_RESULTS} programs that match their goals.
-2. Output TWO sections in MARKDOWN:
+1. SEPARATE the candidates into TWO categories:
+   - **University Programs**: Actual graduate degree programs (MS, PhD, etc.) at specific universities
+   - **External Funding**: Fellowships, scholarships, or sponsorships NOT tied to a specific university program
+   
+2. Pick the BEST {MIN_PROGRAM_RESULTS}-{MAX_PROGRAM_RESULTS} university programs that match their goals.
 
-Section 1: A table showing the programs
+3. Output THREE sections in MARKDOWN:
+
+Section 1: University Programs Table
 Use this header:
 
 | # | Program Name | Degree | University | Location | Tuition, Application Fee & Funding | Key Requirements | Deadline | Program Duration | Intake Term | Website |
 
-For the Website column, use this EXACT format: [Link](url) and it must be the exact link where the search tool found the program details.
-Example: [Link](https://www.example.edu/program)
+ONLY include actual university graduate programs here (MS Data Science at Stanford, PhD in CS at MIT, etc.)
+For the Website column, use this EXACT format: [Link](url) with the actual program page URL.
 
-IMPORTANT: Extract URLs from the raw program candidates and include them in the Website column.
-Always use the actual URLs from the search results.
+Section 2 (if applicable): Additional Funding Opportunities
+If you found external fellowships, scholarships, or sponsorships that are NOT specific university programs:
+- List them separately with bullet points
+- Include: Name, Eligibility, Amount/Benefits, Deadline, Website link
+- Examples: Fulbright, DAAD, government scholarships, private foundations
+- Format links as [Fellowship Name](url)
 
-Section 2: My guidance for you
+Section 3: My guidance for you
 Address the user directly with "you" and "your":
 - 5–8 bullet points explaining:
   - why I picked these programs for you
   - trade-offs you should consider (funding vs prestige vs location)
+  - if there are external funding opportunities, how you can combine them with programs
   - concrete next steps you should take
 
 Rules:
+- CRITICAL: Only put actual university degree programs in the main table
+- Move general fellowships/scholarships to the separate "Additional Funding Opportunities" section
 - Speak TO the user, not ABOUT them (use "you/your" not "the student/their")
 - Be warm and conversational: "You might find X interesting because..." 
 - If you're unsure about a detail, write "Check program page" instead of guessing
@@ -236,7 +310,6 @@ Rules:
 - Reference their specific profile (your GPA, your test scores, your preferred countries)
 - ALWAYS format links as [Link](url) or [Text](url), never paste bare URLs
 - Extract and use actual URLs from the raw program candidates provided
-- Do NOT add a separate References section - the table already has links
 """
 
 
@@ -391,45 +464,75 @@ USER MESSAGE:
 
 def handle_deep_dive(university_query: str, universities: List[str], store: InMemoryProfileStore, session_id: str) -> str:
     """
-    Provide detailed information about a specific university program.
+    Provide detailed, extensive information about a specific university program.
     """
     # Get student profile to include field of study
     profile = store.get_profile(session_id)
     field = profile.field_of_study or "graduate programs"
     degree = profile.degree_level or "MS"
     
-    # Create focused search queries for the university with field context
+    # Create comprehensive, focused search queries for extensive coverage
     search_queries = []
-    for uni in universities[:2]:  # Limit to 2 universities
-        search_queries.append(f'"{uni}" {field} {degree} admissions requirements')
-        search_queries.append(f'"{uni}" {field} graduate program funding scholarships')
-        search_queries.append(f'"{uni}" {field} {degree} international students')
+    for uni in universities[:2]:  # Limit to 2 universities if multiple mentioned
+        # Core program information
+        search_queries.append(f'"{uni}" {field} {degree} program overview')
+        search_queries.append(f'"{uni}" {field} {degree} admission requirements GPA test scores')
+        
+        # Funding and financial
+        search_queries.append(f'"{uni}" {field} {degree} funding RA TA fellowships stipend')
+        search_queries.append(f'"{uni}" {field} graduate program scholarships financial aid')
+        
+        # Application process
+        search_queries.append(f'"{uni}" {field} {degree} application deadline process')
+        
+        # Research and faculty
+        search_queries.append(f'"{uni}" {field} research labs faculty')
+        
+        # Student experience
+        search_queries.append(f'"{uni}" {field} {degree} student experience career outcomes')
+        
+        # Specific details
+        if profile.extra_notes and 'healthcare' in profile.extra_notes.lower():
+            search_queries.append(f'"{uni}" {field} healthcare applications research')
     
-    # Execute searches
+    # Execute MORE searches for comprehensive results (8-10 queries)
     all_results = []
-    for query in search_queries[:3]:  # Limit total searches
+    for query in search_queries[:10]:  # Increased from 3 to 10
         try:
             print(f"[DEBUG] Deep dive search: {query}")
-            res = serper_program_search(query, num_results=5)
+            res = serper_program_search(query, num_results=8)  # Increased from 5 to 8 per query
             all_results.extend(extract_program_candidates(res))
         except Exception as e:
             print(f"[WARN] Search error: {e}")
     
-    # Format search results
+    # Format MORE search results for comprehensive report
     search_results_text = "\n\n".join([
         f"Title: {r['title']}\nURL: {r['url']}\nSnippet: {r['snippet']}"
-        for r in all_results[:10]
+        for r in all_results[:30]  # Increased from 10 to 30 results
     ])
     
-    # Generate response
+    print(f"[DEBUG] Deep dive: Using {len(all_results[:30])} search results for comprehensive report")
+    
+    # Generate response with explicit instruction for extensive report
     prompt = DEEP_DIVE_PROMPT.format(
         university_query=university_query,
-        search_results=search_results_text or "No specific results found. Provide general guidance."
+        search_results=search_results_text or "No specific results found. Provide general guidance based on typical program structure."
     )
     
     model = genai.GenerativeModel(GEMINI_MODEL_NAME)
     response = model.generate_content(prompt)
-    return response.text
+    
+    # Clean up Unicode escape sequences
+    result = response.text
+    result = result.replace(r'\u201c', '"')  # Left double quotation mark
+    result = result.replace(r'\u201d', '"')  # Right double quotation mark
+    result = result.replace(r'\u2018', "'")  # Left single quotation mark
+    result = result.replace(r'\u2019', "'")  # Right single quotation mark
+    result = result.replace(r'\u2013', '–')  # En dash
+    result = result.replace(r'\u2014', '—')  # Em dash
+    result = result.replace(r'\u2026', '...')  # Ellipsis
+    
+    return result
 
 
 def handle_comparison(universities: List[str], aspects: List[str], store: InMemoryProfileStore, session_id: str) -> str:
@@ -474,7 +577,18 @@ def handle_comparison(universities: List[str], aspects: List[str], store: InMemo
     
     model = genai.GenerativeModel(GEMINI_MODEL_NAME)
     response = model.generate_content(prompt)
-    return response.text
+    
+    # Clean up Unicode escape sequences
+    result = response.text
+    result = result.replace(r'\u201c', '"')  # Left double quotation mark
+    result = result.replace(r'\u201d', '"')  # Right double quotation mark
+    result = result.replace(r'\u2018', "'")  # Left single quotation mark
+    result = result.replace(r'\u2019', "'")  # Right single quotation mark
+    result = result.replace(r'\u2013', '–')  # En dash
+    result = result.replace(r'\u2014', '—')  # Em dash
+    result = result.replace(r'\u2026', '...')  # Ellipsis
+    
+    return result
 
 
 def build_writer_prompt(
@@ -522,8 +636,36 @@ def generate_followup_questions(
         results_info = "No programs found"
     else:
         program_count = len(candidates)
-        universities = list(set([c.get('university', 'Unknown') for c in candidates[:10]]))
-        results_info = f"Found {program_count} programs at universities including: {', '.join(universities[:5])}"
+        # Extract university names from titles or domains
+        universities = []
+        for c in candidates[:10]:
+            # Try to extract university from title (e.g., "Program Name - Stanford University")
+            title = c.get('title', '')
+            # Common patterns: "University of X", "X University", "X Institute"
+            if 'University' in title or 'Institute' in title or 'College' in title:
+                # Extract the university name from title
+                parts = title.split('-')
+                if len(parts) > 1:
+                    univ = parts[-1].strip()
+                else:
+                    univ = title
+                universities.append(univ)
+            elif c.get('source'):
+                # Fall back to domain name (e.g., stanford.edu -> Stanford)
+                domain = c.get('source', '')
+                if domain:
+                    # Extract main part of domain (e.g., stanford from stanford.edu)
+                    domain_parts = domain.split('.')
+                    if len(domain_parts) >= 2:
+                        universities.append(domain_parts[-2].title())
+        
+        # Get unique universities, limit to 5
+        unique_universities = list(set([u for u in universities if u]))[:5]
+        
+        if unique_universities:
+            results_info = f"Found {program_count} programs at universities including: {', '.join(unique_universities)}"
+        else:
+            results_info = f"Found {program_count} programs from various universities"
     
     prompt = FOLLOWUP_GENERATOR_PROMPT.format(
         profile=json.dumps(profile_dict, indent=2),
@@ -653,6 +795,16 @@ def execute_agentic_pipeline(
     response = model.generate_content(writer_prompt)
     
     main_response = response.text
+    
+    # Clean up Unicode escape sequences in the response
+    # Replace common Unicode escapes with actual characters
+    main_response = main_response.replace(r'\u201c', '"')  # Left double quotation mark
+    main_response = main_response.replace(r'\u201d', '"')  # Right double quotation mark
+    main_response = main_response.replace(r'\u2018', "'")  # Left single quotation mark
+    main_response = main_response.replace(r'\u2019', "'")  # Right single quotation mark
+    main_response = main_response.replace(r'\u2013', '–')  # En dash
+    main_response = main_response.replace(r'\u2014', '—')  # Em dash
+    main_response = main_response.replace(r'\u2026', '...')  # Ellipsis
     
     # Generate intelligent follow-up questions
     followup_questions = generate_followup_questions(

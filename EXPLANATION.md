@@ -118,14 +118,29 @@ classification = {
 ```python
 # From planner.py - plan_from_user_input()
 search_plan = {
-    "high_level_goal": "Find MS Data Science programs in USA with funding",
+    "high_level_goal": "Find PhD Machine Learning programs in USA with healthcare focus and full funding",
     "search_queries": [
-        "MS Data Science fully funded USA",
-        "Data Science graduate programs scholarships",
-        "Master Data Science RA TA funding"
+        "PhD Machine Learning USA",  # General programs
+        "Machine Learning PhD funding scholarships",  # Funding-specific
+        "PhD Machine Learning admission requirements",  # Requirements
+        "Machine Learning healthcare AI PhD",  # Specialty focus
+        "PhD Machine Learning Fall 2026 fully funded"  # Specific intake
     ],
-    "profile_updates": {...}
+    "profile_updates": {
+        "field_of_study": "Machine Learning",
+        "degree_level": "PhD",
+        "preferred_countries": "US",
+        "gpa": "3.7",
+        "funding_needs": "full funding",
+        "intake_term": "Fall 2026",
+        "extra_notes": "Interested in healthcare applications"
+    }
 }
+# Planner generates 5-7 targeted queries with specific purposes:
+# - Queries 1-2: General program pages
+# - Queries 3-4: Funding-specific searches
+# - Queries 5-6: Requirements/admissions
+# - Query 7: Specialty focus if applicable
 ```
 
 #### Step 6: Tool Execution (Serper API)
@@ -137,23 +152,38 @@ for query in search_queries:
 ```
 
 #### Step 7: Response Synthesis
-The Writer agent combines results into a personalized response with:
-- Program recommendations
-- Admission requirements
-- Funding information
-- Application deadlines
-- Source references with links
+The Writer agent combines results into a personalized response with THREE sections:
+
+**Section 1: University Programs Table**
+- Only actual graduate degree programs (MS, PhD) at specific universities
+- Columns: Program Name, Degree, University, Location, Funding, Requirements, Deadline, Duration, Intake, Website
+- Direct links to program pages
+
+**Section 2: Additional Funding Opportunities (if applicable)**
+- External fellowships, scholarships not tied to specific programs
+- Examples: Fulbright, DAAD, government scholarships
+- Listed separately with eligibility and links
+
+**Section 3: Personalized Guidance**
+- 5-8 bullet points explaining program recommendations
+- Trade-offs to consider (funding vs prestige vs location)
+- How to combine external funding with programs
+- Concrete next steps
 
 #### Step 8: Follow-up Question Generation
 ```python
 # From executor.py - generate_followup_questions()
 followups = {
     "follow_up_questions": [
-        "Would you like me to compare Stanford vs MIT's programs?",
-        "Should I look for programs with later deadlines?",
-        "Are you interested in programs that don't require GRE?"
+        "Would you like me to compare Carnegie Mellon and Cedars-Sinai programs?",
+        "Should I search for programs in Germany?",
+        "Are you interested in learning about application strategies?"
     ]
 }
+# Questions are contextual and personalized based on:
+# - Student profile (GPA, field, preferences)
+# - Query type (new_search, deep_dive, compare)
+# - Results found (specific universities mentioned)
 ```
 
 ---

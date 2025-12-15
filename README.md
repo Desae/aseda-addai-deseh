@@ -225,40 +225,84 @@ streamlit run streamlit_app.py
 
 ## 🔍 How It Works
 
-1. **User Input**: "I want a fully funded MS in AI in the US with a 3.5 GPA"
+### Example Conversation Flow
 
-2. **Coordinator**: 
-   - Extracts: field=AI, degree=MS, location=US, GPA=3.5, funding=full
+**Query 1**: *"I'm interested in PhD programs in Machine Learning in the US, with a focus on healthcare with full funding for the Fall 2026 intake. My GPA is 3.7."*
+
+1. **Coordinator**: 
+   - Extracts: field=Machine Learning, degree=PhD, location=US, GPA=3.7, funding=full, focus=healthcare, intake=Fall 2026
    - Saves to memory immediately
    - Determines: ready to search ✅
 
-3. **Classifier**: Identifies as "new_search"
+2. **Classifier**: Identifies as "new_search"
 
-4. **Planner**: 
-   - Reviews profile: AI, MS, US, 3.5 GPA, full funding
+3. **Planner**: 
+   - Reviews profile: Machine Learning, PhD, US, 3.7 GPA, full funding, healthcare focus
    - Generates queries:
-     - "MS Artificial Intelligence fully funded USA"
-     - "AI graduate programs scholarships 3.5 GPA"
-     - "Master AI funding TA RA USA"
+     - "PhD Machine Learning healthcare USA fully funded"
+     - "Machine Learning healthcare AI PhD programs"
+     - "PhD AI healthcare research funding Fall 2026"
 
-5. **Search Executor**: 
-   - Executes 3 Serper API calls
-   - Collects 15-20 program candidates
+4. **Search Executor**: 
+   - Executes 3-5 Serper API calls
+   - Collects 15-20 program candidates (CMU, Stanford, MIT, etc.)
    - Rate limits appropriately
 
-6. **Writer**: 
+5. **Writer**: 
    - Synthesizes top 5-10 programs
    - Creates markdown table with details
    - Adds personalized guidance
    - Includes source links
 
-7. **Follow-up Generator**:
-   - Suggests: "Would you like to compare Stanford vs MIT's programs?"
-   - Or: "Should I look for programs with later deadlines?"
+6. **Follow-up Generator**:
+   - Suggests: "Would you like to compare Carnegie Mellon and Cedars-Sinai programs?"
+   - Or: "Should I search for programs in other countries?"
+
+---
+
+**Query 2**: *"What about Germany?"* (Follow-up demonstrating memory)
+
+1. **Coordinator**: 
+   - Sees existing profile: GPA=3.7, field=Machine Learning, degree=PhD, healthcare focus, full funding, Fall 2026
+   - Updates ONLY: location=Germany
+   - **Memory preserved**: Doesn't ask for GPA, field, or degree again! ✅
+
+2. **Planner**: 
+   - Uses saved profile + new location
+   - Generates Germany-specific queries:
+     - "PhD Machine Learning healthcare Germany fully funded"
+     - "TU Munich ETH Zurich PhD AI healthcare"
+
+3. **Results**: Returns German programs matching the SAME profile criteria
+
+---
+
+**Query 3**: *"Compare Carnegie Mellon University and Cedars-Sinai programs"*
+
+1. **Classifier**: Identifies as "compare" query
+
+2. **Comparison Handler**:
+   - Extracts: universities = [CMU, Cedars-Sinai]
+   - Remembers: Still looking at Machine Learning + healthcare PhD programs
+   - Performs focused searches on both universities
+
+3. **Writer**: Creates side-by-side comparison table
+   - Focus areas, funding, curriculum, research opportunities
+   - Direct links to both programs
+   - Personalized recommendation
+
+**Key: The system NEVER forgets your GPA, field, degree level, or preferences throughout the entire conversation!**
 
 ---
 
 ## 🌟 Advanced Features
+
+### Memory Persistence
+The system maintains your profile across all questions:
+- **First query**: "I'm interested in PhD programs in Machine Learning in the US, with a focus on healthcare with full funding for the Fall 2026 intake. My GPA is 3.7."
+- **Follow-up**: "What about Germany?" → System remembers your GPA, field, degree, healthcare focus, and funding needs
+- **Profile maintained**: GPA: 3.7, Field: Machine Learning, Degree: PhD, Funding: Full, Focus: Healthcare
+- **Only updates**: Location changes from US to Germany
 
 ### Deep Dive
 Ask for details about a specific university:
@@ -269,15 +313,16 @@ System performs focused research on that program with 3-5 targeted searches.
 
 ### Comparison
 Compare multiple universities side-by-side:
-- "Compare MIT and Stanford"
+- "Compare Carnegie Mellon University and Cedars-Sinai programs"
 - "What's the difference between CMU and Berkeley?"
 
-System creates comparison tables with parallel research.
+System creates comparison tables with parallel research, while still remembering your profile context.
 
 ### Multi-Session Chat
 - Create multiple independent search threads
 - Switch between sessions without losing context
 - Each session maintains its own memory profile
+- Click 🔄 to refresh and see current memory state
 
 ---
 
